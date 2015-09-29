@@ -1,0 +1,11 @@
+[Unit]
+Description=flannel
+Requires=etcd.service
+After=etcd.service
+
+[Service]
+ExecStartPre=-/usr/bin/etcdctl mk /coreos.com/network/config '{"Network":"10.0.0.0/16"}'
+ExecStart=/opt/flanneld -iface=eth1
+
+[Install]
+WantedBy=multi-user.target
