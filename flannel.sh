@@ -8,6 +8,8 @@ sudo cp /home/core/share/flannel.service /etc/systemd/system
 
 cd /etc/systemd/system
 
+etcdctl mk /coreos.com/network/config '{"Network":"10.0.0.0/16"}'
+
 sudo systemctl enable flannel.service
 sudo systemctl start flannel.service
 
