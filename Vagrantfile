@@ -137,6 +137,10 @@ Vagrant.configure("2") do |config|
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
         config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
       end
+      $script = <<EOF
+      echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMg2wbsxmmZyTGElDfQriR1bESCq4aAPrjdJ1QPFGtOUynMkwGkppcTAHxxC1y9YfOemV+QFyiC8lvpWIHkjugdWQk5Rvhtumiizthhew/oHtqUF2SmN6JkDilY3nPVYBmYaa7JDG6fkgtFIfMdMaZeK05201gvaPBKNH+++1TVpAAAAFQC/TMYHkGkb2RDazto0PhrPVjmwowAAAIEAxZtYzm4yF7s1vrhTLPhwj6nUDGWNmSujeqZbOy6BIr+iNo/klPguIFNjK4VYTovY2HVYHdRvrsKQQfj5XuSrb7Z9ZWMWYZgVcp0xJWDS06xQqy8X7rAPwF/qZabhWW46aiU6BCMAbZd5zoGMJXPtT7cpVB+paJWMCAmfMK24sUEAAACBAKZijQjKJSiMzj22r6WGGkBLlg5IBx+oQoWPwZIM4akBaVRaykqD0bxdSJdchnN5FKdFndGNUYORzJilRYdvQAddSgUjpOCHR+8KsXvNK6uOM7711OR2lHBTvT5OLp0o87ZCAbxIecNQFQSF1Danu4lWCSi5MHphhBRYulSDfPuH root@3ca4b5b81e17" >> /home/core/.ssh/authorized_keys
+EOF
+      config.vm.provision :shell, inline: $script
 
     end
   end

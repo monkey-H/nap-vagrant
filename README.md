@@ -9,6 +9,7 @@
 git clone lab.artemisporjects.org/...
 cd nap-vagrant
 3，通过https://discovery.etcd.io/new获得一个新的etcd key，然后替换到user-data中的discovery: http:// 中。
+(new method: make discovery-url)
 4：启动coreos集群。vagrant up
 
 
@@ -24,6 +25,7 @@ cd share
 ./flannel.sh即可。
 在其余的两台机器上同样执行。
 （遇到过一些问题，大部分时候执行一次.flannel.sh即可，有一些时候，会遇到一些flannel服务没有启动的问题，很奇怪的是，多执行两次这个脚本就可以了，具体原因还没有搞清楚，后面再解决。）
+(find the problem. added sleep 5. flannel.service need some time to find subnet and write into /run/flannel/subnet)
 
 
 
