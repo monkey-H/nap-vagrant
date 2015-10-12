@@ -3,6 +3,7 @@ set -x
 
 
 docker pull docker.iwanna.xyz:5000/hmonkey/controller:v3
+docker pull docker.iwanna.xyz:5000/hmonkey/logger:v1
 docker pull docker.iwanna.xyz:5000/hmonkey/database:v1
 docker pull docker.iwanna.xyz:5000/hmonkey/moosefs_client:v1
 docker pull docker.iwanna.xyz:5000/hmonkey/moosefs_chunkserver:v1
@@ -13,6 +14,11 @@ docker stop database
 docker rm database
 database_id=$(docker run -d --name database docker.iwanna.xyz:5000/hmonkey/database:v1 /usr/sbin/sshd -D)
 database_ip=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $database_id)
+
+docker stop logger
+docker rm logger
+logger_id=$(docker run -d --name database docker.iwanna.xyz:5000/hmonkey/logger:v1 /usr/sbin/sshd -D)
+logger_ip=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $logger_id)
 
 docker stop mfsmaster
 docker rm mfsmaster
@@ -38,7 +44,10 @@ ssh root@${chunkserver_ip} "chown -R mfs:mfs /moosefs"
 ssh root@${chunkserver_ip} "/etc/init.d/moosefs-chunkserver start"
 
 ssh root@${database_ip} "/etc/init.d/mysql start"
+ssh root@${logger_ip} "/etc/init.d/rsyslog start"
 
+ssh root@${controller_ip} "echo '${logger_ip}	logger' >> /etc/hosts"
+ssh root@${controller_ip} "/etc/init.d/rsyslog start"
 ssh root@${controller_ip} sed -i "s/MFS_MASTER=.*/MFS_MASTER=${mfsmaster_ip}/g" /root/nap/environment_parameters
 ssh root@${controller_ip} sed -i "s/MYSQL_IP=.*/MYSQL_IP=${database_ip}/g" /root/nap/environment_parameters
 ssh root@${controller_ip} "echo \"command=\\\"/root/nap/nap \\\$SSH_ORIGINAL_COMMAND\\\" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXIqMeN3fs2ZUwtnsQr6tDbsYHYDBQBUKdi+SL+i7AlqEPgafoBFofeANfgzbwuJXg3cZx+Iy9TVolEC1SCTfKBEfd+zEf4QRDpjSelxRrj5DP7mzteWMrkAl3jZp2JmcSEbZiZel969IQZVZDlvW+J/Py3EKQjxVCvb+R0jHuTRCJurMAiOyn3lUBplO9Vomxhb2+IIJ/AgKqUXmz9m4jciYET7WFqvnkxr6T2p27Ca2eb5rAoqj/yClYOX8bZv11crwp0WqDn+0QreD/G1FDNlmKc4MJSekW6uiisqbF2LZUKC7D3FIh+5ztL96Qou/VUb9nddY0cx3wntNxkXfX coreos\" >> /root/.ssh/authorized_keys"
